@@ -1,0 +1,22 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+
+# Migration / compare artifacts (generated, not source)
+artifacts/
+*.dacpac
+
+# Local secrets & environment (NEVER commit credentials)
+.env
+*.env
+*.publish.local.xml
+*.user
+
+# Logs
+logs/
+*.log
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.vs/

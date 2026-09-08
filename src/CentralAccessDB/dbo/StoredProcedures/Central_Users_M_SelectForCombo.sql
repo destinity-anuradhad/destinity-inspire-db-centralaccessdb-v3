@@ -1,0 +1,15 @@
+CREATE PROCEDURE [dbo].[Central_Users_M_SelectForCombo]
+AS
+BEGIN
+
+	SET NOCOUNT ON;
+	SET DATEFORMAT DMY
+
+	SELECT	* 
+	FROM	Central_Users
+	WHERE IsActive=1
+	ORDER BY FullName ASC
+END
+
+GO
+

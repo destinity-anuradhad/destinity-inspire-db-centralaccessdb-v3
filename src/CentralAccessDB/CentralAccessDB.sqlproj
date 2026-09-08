@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.Build.Sql/2.2.0">
+  <PropertyGroup>
+    <Name>CentralAccessDB</Name>
+    <!-- Target platform: SQL Server 2019 (source is 15.0.2000). -->
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql150DatabaseSchemaProvider</DSP>
+    <ModelCollation>1033, CI</ModelCollation>
+    <!--
+      Synonyms in this DB point at an external database [Common]. Those cross-database
+      references are intentionally unresolved (no [Common] project reference exists),
+      so downgrade the resulting "unresolved reference" errors to warnings instead of
+      failing the build. Remove these codes once a [Common] database reference is added.
+        SQL71501 - unresolved reference to object
+        SQL71562 - unresolved reference in a synonym / cross-database reference
+        SQL71558 - reference differs only by case (DB collation is case-insensitive;
+                   cosmetic only, but ~315 of them would otherwise bury real warnings)
+    -->
+    <SuppressTSqlWarnings>71501;71562;71558</SuppressTSqlWarnings>
+    <TreatTSqlWarningsAsErrors>False</TreatTSqlWarningsAsErrors>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,6 @@
+CREATE SCHEMA [FA_Tran]
+    AUTHORIZATION [dbo];
+
+
+GO
+

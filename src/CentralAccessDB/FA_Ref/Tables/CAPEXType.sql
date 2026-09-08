@@ -1,0 +1,9 @@
+CREATE TABLE [FA_Ref].[CAPEXType] (
+    [Id]   INT            IDENTITY (1, 1) NOT NULL,
+    [Type] NVARCHAR (200) NULL,
+    CONSTRAINT [PK_CAPEXType] PRIMARY KEY CLUSTERED ([Id] ASC)
+);
+
+
+GO
+

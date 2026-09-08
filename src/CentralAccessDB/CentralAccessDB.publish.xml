@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Deployment options shared by compare.ps1 (script generation) and deploy.ps1 (publish).
+  This profile intentionally contains NO target connection - the target server/database
+  is supplied on the command line so the same safe options apply to every environment.
+
+  Defaults here are conservative/non-destructive. Review before flipping any to True:
+    * DropObjectsNotInSource = False  -> objects that exist in the OLD db but not in the
+      project are LEFT ALONE. Set True only when you truly want the target to become an
+      exact mirror of the project (this DROPS extra tables/procs and can lose data).
+    * BlockOnPossibleDataLoss = True  -> aborts rather than run a step that could drop data.
+    * Principals/permissions are excluded because only application-scoped schema objects
+      were extracted (no logins/users). Manage security separately.
+-->
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BlockOnPossibleDataLoss>True</BlockOnPossibleDataLoss>
+    <DropObjectsNotInSource>False</DropObjectsNotInSource>
+    <DropPermissionsNotInSource>False</DropPermissionsNotInSource>
+    <DropRoleMembersNotInSource>False</DropRoleMembersNotInSource>
+    <IgnorePermissions>True</IgnorePermissions>
+    <IgnoreLoginSids>True</IgnoreLoginSids>
+    <IgnoreUserSettingsObjects>True</IgnoreUserSettingsObjects>
+    <AllowIncompatiblePlatform>True</AllowIncompatiblePlatform>
+    <VerifyDeployment>True</VerifyDeployment>
+    <ScriptDatabaseOptions>False</ScriptDatabaseOptions>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <ExcludeObjectTypes>Logins;Users;RoleMembership;Permissions;ServerRoleMembership;Credentials</ExcludeObjectTypes>
+  </PropertyGroup>
+</Project>

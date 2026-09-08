@@ -1,0 +1,7 @@
+# Normalize line endings. SQL Server tooling and diffs are happiest with CRLF
+# for T-SQL and PowerShell sources.
+* text=auto
+*.sql  text eol=crlf
+*.ps1  text eol=crlf
+*.xml  text eol=crlf
+*.sqlproj text eol=crlf

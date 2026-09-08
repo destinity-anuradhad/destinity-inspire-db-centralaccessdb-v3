@@ -1,0 +1,6 @@
+{
+  "enabledPlugins": {
+    "dbhub@dbhub": true,
+    "sqlserver@sqlserver": true
+  }
+}
