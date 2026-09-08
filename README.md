@@ -26,11 +26,26 @@ against whatever the target currently is and produces the migration script. No h
 
 ## Prerequisites
 
-| Tool | Version found | Install |
-|------|---------------|---------|
-| .NET SDK | 10.0.200 | https://dotnet.microsoft.com |
-| SqlPackage | 170.4.83 | `dotnet tool install --global microsoft.sqlpackage` |
-| sqlcmd | 15.0 | part of SQL Server client tools |
+Run **`0_check_prerequisites.ps1`** first — it checks the machine for everything below and,
+for any missing **required** tool, downloads and installs it (winget where possible, else the
+official Microsoft install script), showing each step in colour with an `OK / MISSING /
+INSTALLED / FAILED` status and a final summary.
+
+```powershell
+.\scripts\0_check_prerequisites.ps1                     # check + install missing (asks before each)
+.\scripts\0_check_prerequisites.ps1 -CheckOnly          # report only, install nothing
+.\scripts\0_check_prerequisites.ps1 -IncludeOptional -Force   # install everything, no prompts
+```
+
+Machine-wide installs (the .NET SDK) may prompt for elevation — run PowerShell **as
+Administrator** for the smoothest experience. Installing the SDK / SqlPackage needs internet access.
+
+| Tool | Version found | Required | Install |
+|------|---------------|----------|---------|
+| .NET SDK | 10.0.200 | yes | https://dotnet.microsoft.com |
+| SqlPackage | 170.4.83 | yes | `dotnet tool install --global microsoft.sqlpackage` |
+| sqlcmd | 15.0 | optional | part of SQL Server client tools |
+| Git | 2.x | optional | https://git-scm.com |
 
 ## Repository layout
 
@@ -43,6 +58,7 @@ src/CentralAccessDB/
   dbo/  FA_Ref/  FA_Tran/        Tables / StoredProcedures / Functions / Views / Synonyms
 scripts/                         (run in numbered order; _Common is a shared helper, not a step)
   _Common.ps1                    Shared helpers (sqlpackage lookup, connection strings, secrets)
+  0_check_prerequisites.ps1      Check the machine and install missing tools (.NET SDK, SqlPackage, ...)
   1_extract.ps1                  Refresh the project from the live source DB
   2_build.ps1                    dotnet build -> dacpac
   3_compare.ps1                  Generate migration script + change report vs a target DB (read-only)
@@ -62,6 +78,9 @@ artifacts/                       Generated migration scripts / reports (git-igno
 ## Usage
 
 ```powershell
+# 0. One-time on a new machine: check + install the required tools
+.\scripts\0_check_prerequisites.ps1
+
 # 1. Refresh the project from the live source DB (re-run whenever the DB changes)
 $env:SOURCE_DB_PASSWORD = '<source-password>'
 .\scripts\1_extract.ps1
