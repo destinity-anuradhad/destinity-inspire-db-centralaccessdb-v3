@@ -24,6 +24,10 @@ param(
 
 . "$PSScriptRoot\_Common.ps1"
 if (-not $NoLog) { Start-ScriptLog -Name '2_build' }
+Set-LowProcessPriority
+# Don't leave MSBuild build-server processes resident holding RAM after the build.
+$env:MSBUILDDISABLENODEREUSE = '1'
+$env:DOTNET_CLI_TELEMETRY_OPTOUT = '1'
 
 $failed = $false
 try {
@@ -34,7 +38,8 @@ try {
     $targetArg = if ($Rebuild) { '-t:Rebuild' } else { $null }
 
     Write-Host "Building $project ($Configuration) ..." -ForegroundColor Cyan
-    $buildArgs = @($project, '-c', $Configuration, '-v', 'minimal') + @($targetArg | Where-Object { $_ })
+    # -m:1 / --nodeReuse:false keep the build to a single, non-resident worker (lower CPU/RAM footprint).
+    $buildArgs = @($project, '-c', $Configuration, '-v', 'minimal', '-m:1', '--nodeReuse:false') + @($targetArg | Where-Object { $_ })
     # Route build output to the host so it doesn't pollute this script's return value
     # (3_compare.ps1/4_deploy.ps1 capture the returned dacpac path).
     dotnet build @buildArgs 2>&1 | Out-Host
@@ -53,6 +58,7 @@ catch {
     if ($_.ScriptStackTrace) { Write-Host $_.ScriptStackTrace -ForegroundColor DarkGray }
 }
 finally {
+    Stop-BuildServers   # release build-server RAM immediately
     if (-not $NoLog) { Write-ScriptStatus -Failed $failed }
     Stop-ScriptLog
     if (-not $NoPause) { Wait-ForKeyIfInteractive }

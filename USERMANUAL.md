@@ -92,9 +92,13 @@ What happens next:
 | Red text / `STATUS: FAILED` about **login/password** | Wrong username or password | Re‑run and re‑type the password carefully. |
 | Red text about **connect / timeout** | Not reachable on the network | Connect to the office network / VPN, then try again. |
 | A **required tool** is missing | Step 3 did not finish | Re‑run Step 3 (as administrator if needed). |
+| The **computer gets slow / CPU or RAM is high** while it runs | The build/compare work is heavy for a short time | This is normal **while a step is running** and settles when it finishes. If it stays slow, don’t run it **on the database server itself** — ask a developer to run it from a **different computer**, and prefer **outside busy hours**. |
 
 When in doubt, **don’t type `YES`** — nothing changes until you do. Then send the newest file
 from the **`logs`** folder to a developer for help.
+
+> ⏳ **Note:** the very first run of **Step 3** downloads and installs tools, so it can be slow and
+> use a lot of CPU **that one time** — this is expected and only happens once per computer.
 
 ---
 

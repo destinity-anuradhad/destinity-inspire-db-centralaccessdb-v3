@@ -32,6 +32,7 @@ param(
 
 . "$PSScriptRoot\_Common.ps1"
 if (-not $NoLog) { Start-ScriptLog -Name '1_extract' }
+Set-LowProcessPriority
 
 $failed   = $false
 $tempRoot = $null

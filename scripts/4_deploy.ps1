@@ -46,6 +46,7 @@ param(
 
 . "$PSScriptRoot\_Common.ps1"
 if (-not $NoLog) { Start-ScriptLog -Name '4_deploy' }
+Set-LowProcessPriority
 
 $failed = $false
 try {

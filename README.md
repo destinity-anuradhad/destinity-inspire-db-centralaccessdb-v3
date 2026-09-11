@@ -116,6 +116,24 @@ $env:TARGET_DB_PASSWORD = '<target-password>'
 
 Omit `-TargetUser` to use Windows integrated authentication.
 
+## Performance / resource usage
+
+These steps are deliberately CPU/RAM-heavy for a short time: `dotnet build` compiles a model of
+every object, and SqlPackage builds an in-memory model of the whole database and queries the target
+server for its metadata. If a machine is slow or shows high CPU/RAM while running these:
+
+- **Don't run on the SQL Server host.** Run from a **separate workstation / admin box** on the same
+  network. On the DB server the tooling competes with `sqlservr.exe` for the same CPU/RAM — the most
+  common cause of a slow server.
+- The scripts already run at **BelowNormal priority** (the `dotnet`/`sqlpackage` children inherit it)
+  and **shut down MSBuild build servers** after each build so RAM is released immediately. Set
+  `CADB_PRIORITY=Normal` to run at full speed instead.
+- Prefer **off-peak hours** for `3_compare` / `4_deploy` — their metadata queries add load to the target DB.
+- Give the machine enough RAM — SqlPackage's model can need **~1–2 GB**; on a low-RAM box it will swap and crawl.
+- If real-time antivirus scans every build output, exclude the repo's `bin/`, `obj/`, and the
+  `%USERPROFILE%\.dotnet` folder from scanning.
+- The `.NET SDK` install inside `0_check_prerequisites.ps1` is heavy **while it runs** — that's a one-time, expected spike.
+
 ## Deployment safety (`CentralAccessDB.publish.xml`)
 
 Defaults are conservative:

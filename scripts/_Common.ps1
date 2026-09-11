@@ -111,6 +111,29 @@ function Wait-ForKeyIfInteractive {
 }
 
 # ---------------------------------------------------------------------------
+# Resource use: the heavy steps (dotnet build, SqlPackage) can spike CPU/RAM. Run them at
+# BelowNormal priority so the machine stays responsive - the dotnet/sqlpackage child
+# processes inherit the priority class from this process. Opt out with $env:CADB_PRIORITY='Normal'.
+# ---------------------------------------------------------------------------
+function Set-LowProcessPriority {
+    if ($env:CADB_PRIORITY -eq 'Normal') { return }
+    try {
+        [System.Diagnostics.Process]::GetCurrentProcess().PriorityClass =
+            [System.Diagnostics.ProcessPriorityClass]::BelowNormal
+        Write-Host 'Priority: BelowNormal (keeps the machine responsive; set CADB_PRIORITY=Normal to disable).' -ForegroundColor DarkGray
+    } catch {
+        Write-Host "WARN: could not lower process priority: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+}
+
+# Shut down resident MSBuild build-server processes so they stop holding RAM after a build.
+# (dotnet keeps these alive for ~15 min by default to speed up re-builds; on a shared/low-RAM
+# server they accumulate. Combined with MSBUILDDISABLENODEREUSE=1 this keeps the footprint down.)
+function Stop-BuildServers {
+    try { & dotnet build-server shutdown 2>&1 | Out-Null } catch { }
+}
+
+# ---------------------------------------------------------------------------
 # Logging: capture everything a script prints (output + errors) to a .txt log.
 # ---------------------------------------------------------------------------
 $global:__CADB_LogPath = $null
